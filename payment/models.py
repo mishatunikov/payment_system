@@ -8,7 +8,7 @@ from payment.validators import inn_validator
 class Organization(models.Model):
     """Organization Model."""
 
-    payer_inn = models.CharField(
+    inn = models.CharField(
         verbose_name='ИНН',
         primary_key=True,
         validators=[
@@ -27,7 +27,7 @@ class Organization(models.Model):
     class Meta:
         verbose_name = 'организация'
         verbose_name_plural = 'Организации'
-        ordering = ('payer_inn',)
+        ordering = ('inn',)
 
     def __str__(self):
         return f'Организация {self.payer_inn}'

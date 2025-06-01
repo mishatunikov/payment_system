@@ -8,6 +8,7 @@ from payment.validators import inn_validator
 
 
 class PaymentReadSerializer(serializers.ModelSerializer):
+    """Serializer for representation Payment info."""
 
     class Meta:
         model = Payment
@@ -45,9 +46,7 @@ class PaymentWriteSerializer(serializers.Serializer):
     def create(self, validated_data):
 
         payer_inn = validated_data.pop('payer_inn')
-        organization, _ = Organization.objects.get_or_create(
-            payer_inn=payer_inn
-        )
+        organization, _ = Organization.objects.get_or_create(inn=payer_inn)
         organization.balance += validated_data['amount']
         organization.save()
         instance = Payment.objects.create(
