@@ -18,10 +18,9 @@ class PaymentAPIView(APIView):
             data=request.data, context=request.data
         )
         serializer.is_valid(raise_exception=True)
-        operation_id = request.data['operation_id']
 
         if payment := Payment.objects.filter(
-            operation_id=operation_id
+            operation_id=request.data['operation_id']
         ).first():
             return Response(
                 PaymentReadSerializer(payment).data, status=status.HTTP_200_OK
