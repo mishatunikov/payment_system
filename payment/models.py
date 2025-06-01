@@ -45,9 +45,6 @@ class Payment(models.Model):
     )
     amount = models.BigIntegerField(
         verbose_name='Сумма транзакции',
-        validators=[
-            MinValueValidator(consts.MIN_VALUE),
-        ],
     )
     payer_inn = models.ForeignKey(
         Organization,
