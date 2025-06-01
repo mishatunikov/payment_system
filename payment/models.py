@@ -2,6 +2,7 @@ from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 from payment import consts
+from payment.validators import inn_validator
 
 
 class Organization(models.Model):
@@ -11,15 +12,7 @@ class Organization(models.Model):
         verbose_name='ИНН',
         primary_key=True,
         validators=[
-            RegexValidator(
-                regex=(
-                    rf'^\d{consts.MIN_INN_LENGTH}$|'
-                    rf'^\d{consts.MAX_INN_LENGTH}$'
-                ),
-                message=f'ИНН должен содержать либо '
-                f'{consts.MIN_INN_LENGTH}, либо '
-                f'{consts.MAX_INN_LENGTH} цифр',
-            )
+            inn_validator,
         ],
         max_length=consts.MAX_INN_LENGTH,
     )
