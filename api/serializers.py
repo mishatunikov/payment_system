@@ -1,3 +1,5 @@
+import logging
+
 from django.core.validators import MinValueValidator
 from rest_framework import serializers
 
@@ -5,6 +7,8 @@ from api import consts
 from payment.consts import MAX_INN_LENGTH, MIN_INN_LENGTH
 from payment.models import Organization, Payment
 from payment.validators import inn_validator
+
+logger = logging.getLogger(__name__)
 
 
 class PaymentReadSerializer(serializers.ModelSerializer):
@@ -44,10 +48,15 @@ class PaymentWriteSerializer(serializers.Serializer):
     document_date = serializers.DateTimeField(required=True)
 
     def create(self, validated_data):
-
         payer_inn = validated_data.pop('payer_inn')
+        amount = validated_data['amount']
         organization, _ = Organization.objects.get_or_create(inn=payer_inn)
-        organization.balance += validated_data['amount']
+        organization.balance += amount
+        logger.info(
+            f'Баланс организации {organization.inn} изменен на '
+            f'{amount}. {organization.balance - amount} -> '
+            f'{organization.balance}'
+        )
         organization.save()
         instance = Payment.objects.create(
             payer_inn=organization, **validated_data
