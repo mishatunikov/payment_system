@@ -1,3 +1,73 @@
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
-# Create your models here.
+from payment import consts
+
+
+class Organization(models.Model):
+    """Organization Model."""
+
+    payer_inn = models.CharField(
+        verbose_name='ИНН',
+        primary_key=True,
+        validators=[
+            RegexValidator(
+                regex=(
+                    rf'^\d{consts.MIN_INN_LENGTH}$|'
+                    rf'^\d{consts.MAX_INN_LENGTH}$'
+                ),
+                message=f'ИНН должен содержать либо '
+                f'{consts.MIN_INN_LENGTH}, либо '
+                f'{consts.MAX_INN_LENGTH} цифр',
+            )
+        ],
+        max_length=consts.MAX_INN_LENGTH,
+    )
+    balance = models.BigIntegerField(
+        verbose_name='баланс',
+        validators=[
+            MinValueValidator(consts.MIN_VALUE),
+        ],
+    )
+
+    class Meta:
+        verbose_name = 'организация'
+        verbose_name_plural = 'Организации'
+        ordering = ('payer_inn',)
+
+    def __str__(self):
+        return f'Организация {self.payer_inn}'
+
+
+class Payment(models.Model):
+    """Payment Model."""
+
+    operation_id = models.CharField(
+        max_length=consts.CHAR_MAX_LENGTH,
+        verbose_name='идентификатор',
+        primary_key=True,
+    )
+    amount = models.BigIntegerField(
+        verbose_name='Сумма транзакции',
+        validators=[
+            MinValueValidator(consts.MIN_VALUE),
+        ],
+    )
+    payer_inn = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name='payments'
+    )
+    document_number = models.CharField(max_length=consts.CHAR_MAX_LENGTH)
+    document_date = models.DateTimeField(
+        verbose_name='дата создания документа'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='дата добавления в бд'
+    )
+
+    class Meta:
+        verbose_name = 'транзакция'
+        verbose_name_plural = 'Транзакции'
+        ordering = ('-document_date',)
+
+    def __str__(self):
+        return f'Транзакция {self.operation_id}: {self.amount}'
