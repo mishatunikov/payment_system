@@ -19,9 +19,6 @@ class Organization(models.Model):
     )
     balance = models.BigIntegerField(
         verbose_name='баланс',
-        validators=[
-            MinValueValidator(consts.MIN_VALUE),
-        ],
         default=consts.DEFAULT_BALANCE,
     )
 
