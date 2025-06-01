@@ -21,6 +21,7 @@ class Organization(models.Model):
         validators=[
             MinValueValidator(consts.MIN_VALUE),
         ],
+        default=consts.DEFAULT_BALANCE,
     )
 
     class Meta:
