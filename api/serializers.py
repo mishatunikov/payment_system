@@ -1,7 +1,7 @@
 import logging
 
-from django.core.validators import MinValueValidator
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 from api import consts
 from payment.consts import MAX_INN_LENGTH, MIN_INN_LENGTH
@@ -31,9 +31,7 @@ class PaymentWriteSerializer(serializers.Serializer):
     operation_id = serializers.CharField(
         max_length=consts.CHAR_MAX_LENGTH, required=True
     )
-    amount = serializers.IntegerField(
-        validators=[MinValueValidator(consts.MIN_VALUE)], required=True
-    )
+    amount = serializers.IntegerField(required=True)
     payer_inn = serializers.CharField(
         min_length=MIN_INN_LENGTH,
         max_length=MAX_INN_LENGTH,
