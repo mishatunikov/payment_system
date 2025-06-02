@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 logging.basicConfig(
     level=logging.INFO,
     format='%(filename)s:%(lineno)d #%(levelname)-8s '
-           '[%(asctime)s] - %(name)s - %(message)s',
+    '[%(asctime)s] - %(name)s - %(message)s',
 )
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config.django.secret_key
@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'payment.apps.PaymentConfig',
     'api.apps.ApiConfig',
-
 ]
 
 MIDDLEWARE = [
@@ -70,12 +69,27 @@ WSGI_APPLICATION = 'payment_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if not config.django.db_prod:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config.db.MYSQL_DATABASE,
+            'USER': config.db.MYSQL_USER,
+            'PASSWORD': config.db.MYSQL_PASSWORD,
+            'HOST': config.db.MYSQL_HOST,
+            'PORT': config.db.MYSQL_PORT,
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
